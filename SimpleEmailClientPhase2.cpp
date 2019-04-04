@@ -22,8 +22,10 @@ using namespace std;
 #include<vector>
 #include <boost/algorithm/string.hpp> 
 
-int main(int argc, char *argv[])
-{					// -------------------------------------------------------------------------------- part a -------------------------------------------------
+#define PORT 5000;
+
+
+int main(int argc, char *argv[]){
 	if(argc != 4) { cout << "Usage : [filename] [IP:portNum] [user-name] [password]\n";    exit(1);}
 
 	string ip_port = string(argv[1]); 
@@ -39,7 +41,7 @@ int main(int argc, char *argv[])
 	string username = argv[2];
 	string password = argv[3];
 
-	// create a socket   ....       socket function
+	// create a socket   ....
 	int network_socket;
 	network_socket = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -62,9 +64,8 @@ int main(int argc, char *argv[])
     inet_ntop(AF_INET, &(server_address.sin_addr), ip, INET_ADDRSTRLEN);
 
 	if(connection_status == 0){
-		cout <<"ConnectDone: " << ip << ":"<< ntohs(server_address.sin_port) << endl;
+		cout <<"ConnectDone: " << ip << ":" << ntohs(server_address.sin_port) << endl;
 	}
-
 //-------------------------------------------------------------------------------------- part c -----------------------------------------------
 	//Send null terminated string “User: user-name Pass: passwd” over the TCP connection.
 	string ts = "User: " +  string(argv[2]) + " Pass: " + string(argv[3]); 
@@ -77,14 +78,21 @@ int main(int argc, char *argv[])
 	char server_response[1024];
 	int receive_num = recv(network_socket, &server_response, sizeof(server_response), 0);
 	//print out the server's response
-	if(receive_num  > 0)	cout << string(server_response) << endl;
+	if(receive_num > 0){ cout << string(server_response) << endl; }
+	
 
+//----------------------------------------------------LIST --------------------------------------------------------
+
+	char  tosend1[1024] = "LIST\0";
+	sent = send(network_socket ,tosend1, sizeof(tosend1) , 0);
+
+	char server_response3[1024];
+	int receive_num2 = recv(network_socket, server_response3, sizeof(server_response3) , 0);
+	if(receive_num2 > 0) { cout << server_response3 << endl;}
 
 //----------------------------------------------------------------------------------part d -------------------------------------------------
 	// null-terminated string "quit"
-	string kk = "quit\0";
-	char  tosend2[1024];
-	strcpy(tosend2, kk.c_str());
+	char  tosend2[1024] = "quit\0";
 	send(network_socket ,tosend2, sizeof(tosend2) , 0);
 //----------------------------------------------------------------------------------part e -------------------------------------------------
 
@@ -92,4 +100,6 @@ int main(int argc, char *argv[])
 	close(network_socket);
 
 	return 0;
+
+
 }
